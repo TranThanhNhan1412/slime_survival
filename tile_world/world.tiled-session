@@ -1,0 +1,133 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "desert__mountain.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "[A]Dirt_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[A]Flower_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[A]Grass_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[A]Wall-Up_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[A]WaterFall_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[A]Water_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[Base]BaseChip_pipo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "delta.tmx": {
+            "scale": 0.9025,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 478.67036011080336,
+                "y": 480.33240997229916
+            }
+        },
+        "desert__mountain.tmx": {
+            "scale": 0.9025,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.8864265927979,
+                "y": 480.33240997229916
+            }
+        },
+        "forest__swamp.tmx": {
+            "scale": 0.9025,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 479.7783933518006,
+                "y": 480.33240997229916
+            }
+        },
+        "pipo-map001_at.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "river__mountain_water_fall.tmx": {
+            "scale": 0.9025,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.8864265927979,
+                "y": 480.33240997229916
+            }
+        },
+        "swamp__forest.tmx": {
+            "scale": 0.9025,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.8864265927979,
+                "y": 480.33240997229916
+            }
+        },
+        "volcano__snow_mountain.tmx": {
+            "scale": 0.9025,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 478.67036011080336,
+                "y": 480.33240997229916
+            }
+        }
+    },
+    "last.imagePath": "D:/game/Asset/PIPOYA/tileset/32x32",
+    "last.worldFilePath": "D:/game/slime_survival/tile_world",
+    "loadedWorlds": [
+        "D:/game/slime_survival/tile_world/slime_world.world"
+    ],
+    "map.height": 100,
+    "map.lastUsedFormat": "tmx",
+    "map.width": 100,
+    "openFiles": [
+        "delta.tmx",
+        "forest__swamp.tmx",
+        "river__mountain_water_fall.tmx",
+        "desert__mountain.tmx",
+        "volcano__snow_mountain.tmx",
+        "[A]Flower_pipo.tsx",
+        "[A]Grass_pipo.tsx",
+        "[A]Wall-Up_pipo.tsx",
+        "[A]Water_pipo.tsx",
+        "[A]WaterFall_pipo.tsx",
+        "[Base]BaseChip_pipo.tsx",
+        "[A]Dirt_pipo.tsx",
+        "pipo-map001_at.tsx",
+        "pipo-map001_at.tsx"
+    ],
+    "project": "world.tiled-project",
+    "recentFiles": [
+        "delta.tmx",
+        "forest__swamp.tmx",
+        "river__mountain_water_fall.tmx",
+        "pipo-map001_at.tsx",
+        "[A]Dirt_pipo.tsx",
+        "[Base]BaseChip_pipo.tsx",
+        "[A]WaterFall_pipo.tsx",
+        "[A]Water_pipo.tsx",
+        "[A]Wall-Up_pipo.tsx",
+        "[A]Grass_pipo.tsx",
+        "[A]Flower_pipo.tsx",
+        "volcano__snow_mountain.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.useTransparentColor": true
+}

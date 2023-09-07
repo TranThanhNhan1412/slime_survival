@@ -1,0 +1,18 @@
+# created by virtualenv automatically
+/media/
+/test/
+/[Vv]env/
+/[Vv]env
+__pycache__
+/[Ll]ogs
+/backup/
+
+*.log
+*.pyc
+.ipynb_checkpoint
+
+nhap.py
+test.py
+*.nsi
+
+

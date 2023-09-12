@@ -45,9 +45,9 @@ class MyGame(arcade.Window):
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
-        self.scene.add_sprite_list_after("Player","river")
-        self.scene.add_sprite_list_before("Player","river")
-        self.scene.add_sprite_list_before("Player","river")
+        # self.scene.add_sprite_list_after("Player","river")
+        # self.scene.add_sprite_list_before("Player","river")
+        # self.scene.add_sprite_list_before("Player","river")
 
         self.create_player()
         self.scene.add_sprite("Player", self.player_sprite)

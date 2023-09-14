@@ -14,6 +14,8 @@ class MyGame(arcade.Window):
 
         # Tilemap Object
         self.tile_map = None
+        self.map_width = SCREEN_WIDTH
+        self.map_height = SCREEN_HEIGHT
         self.scene = None
 
         # Set up the player
@@ -41,19 +43,21 @@ class MyGame(arcade.Window):
         # Scene
         self.scene = arcade.Scene()
 
+        # Map
         self.create_map()
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
-        self.scene.add_sprite_list_after("Player","river")
-        self.scene.add_sprite_list_before("Player","river")
-        self.scene.add_sprite_list_before("Player","river")
-
-        self.create_player()
+        self.scene.add_sprite_list_after("Player", "fence_wall")
+        self.scene.add_sprite_list_before("Player", "tree")
+        
+        # player
+        self.create_player(self.map_width / 2, self.map_height / 2)
         self.scene.add_sprite("Player", self.player_sprite)
 
-        obstructions = [self.tile_map.sprite_lists["river"],]
 
+        # obstructions
+        obstructions = [self.tile_map.sprite_lists["fence_wall"],]
         self.physics_engine = arcade.PhysicsEngineSimple(
             self.player_sprite,
             obstructions
@@ -125,7 +129,7 @@ class MyGame(arcade.Window):
         # Pan to the user
         self.pan_camera_to_player()
 
-    def create_player(self):
+    def create_player(self, start_x=0, start_y=0):
         #  player
         self.player_action = "Idle"
         self.player_face_direction = "DOWN"
@@ -133,23 +137,26 @@ class MyGame(arcade.Window):
             PLAYER_PATH+self.player_action+"/tile000.png",
             PLAYER_SCALING,
         )
-        self.player_sprite.center_x = SCREEN_WIDTH/2
-        self.player_sprite.center_y = SCREEN_HEIGHT/2
+        self.player_sprite.center_x = start_x
+        self.player_sprite.center_y = start_y
 
     def create_map(self):
         #  maps
         layer_options = {
-            "delta": {"use_spatial_hash": True},
-            "bridge": {"use_spatial_hash": True},
-            "river": {"use_spatial_hash": True},
+            "tree": {"use_spatial_hash": True},
+            "fence_wall": {"use_spatial_hash": True},
+            "background": {"use_spatial_hash": True},
+            "ground": {"use_spatial_hash": True},
 
         }
 
         # Read in the tiled map
         self.tile_map = arcade.load_tilemap(
-            MAP_PATH, layer_options=layer_options,
+            MAP['delta'], layer_options=layer_options,
             scaling=TILE_SCALING
         )
+        self.map_width = self.tile_map.width * GRID_PIXEL_SIZE
+        self.map_height = self.tile_map.height * GRID_PIXEL_SIZE
 
     def pan_camera_to_player(self):
 
@@ -159,6 +166,11 @@ class MyGame(arcade.Window):
         screen_center_y = self.player_sprite.center_y - (
             self.camera.viewport_height / 2
         )
+        screen_center_x = max(0,screen_center_x)
+        screen_center_y = max(0,screen_center_y)
+        screen_center_x = min(screen_center_x,self.map_width)
+        screen_center_y = min(screen_center_y,self.map_height)
+
         user_centered = screen_center_x, screen_center_y
         self.camera.move_to(user_centered)
 

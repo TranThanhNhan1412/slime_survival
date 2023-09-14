@@ -7,7 +7,7 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 
 TILE_PIXEL_SIZE = 32
-TILE_SCALING = 1
+TILE_SCALING = 2
 
 PLAYER_PIXEL_SIZE = 16
 PLAYER_SCALING = 2
@@ -30,3 +30,5 @@ MAP = {
 }
 
 PLAYER_PATH = "./slime_survival/sprite/Player/"
+
+SOUND_PATH = "./slime_survival/sound/"

@@ -1,11 +1,12 @@
+import os
+
+import math
 import time
 import arcade
 from constain import *
 
 
-# feat: port hit and noti
-
-# fix: stop cammera on top and right edges
+# 
 
 class MyGame(arcade.Window):
     """Main application class."""
@@ -20,14 +21,16 @@ class MyGame(arcade.Window):
         self.tile_map = None
         self.map_width = SCREEN_WIDTH
         self.map_height = SCREEN_HEIGHT
+        self.teleport = None
+
+        # scene
         self.scene = None
 
-        # Set up the player
+        # player
         self.player_sprite = None
         self.physics_engine = None
-
-        # player
         self.player_action = None
+        #IDLE,WALK,ATTACK,TELEPORTING
         self.player_face_direction = None
 
         # Fps
@@ -40,6 +43,9 @@ class MyGame(arcade.Window):
         self.gui_camera = None
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
+
+        # Load sounds
+        self.teleport_sound = arcade.load_sound(SOUND_PATH+"teleport.wav")
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -132,6 +138,14 @@ class MyGame(arcade.Window):
         # Pan to the user
         self.pan_camera_to_player()
 
+        is_in_teleport = arcade.check_for_collision_with_lists(
+            self.player_sprite, self.teleport,
+        )
+        for port in is_in_teleport:
+            if(self.player_action!="TELEPORTING"):
+                self.player_action ="TELEPORTING"
+                arcade.play_sound(self.teleport_sound)
+
     def create_player(self, start_x=0, start_y=0):
         #  player
         self.player_action = "Idle"
@@ -150,6 +164,7 @@ class MyGame(arcade.Window):
             "fence_wall": {"use_spatial_hash": True},
             "background": {"use_spatial_hash": True},
             "ground": {"use_spatial_hash": True},
+            "teleport": {"use_spatial_hash": True},
 
         }
 
@@ -161,6 +176,10 @@ class MyGame(arcade.Window):
         self.map_width = self.tile_map.width * GRID_PIXEL_SIZE
         self.map_height = self.tile_map.height * GRID_PIXEL_SIZE
 
+        self.teleport = [
+            self.tile_map.sprite_lists["teleport"],
+        ]
+
     def pan_camera_to_player(self):
 
         # This spot would center on the user
@@ -171,16 +190,16 @@ class MyGame(arcade.Window):
         if (x - padding_x) < 0:
             screen_center_x = 0
         elif (x+padding_x) > self.map_width:
-            screen_center_x = self.map_width- self.camera.viewport_width
+            screen_center_x = self.map_width - self.camera.viewport_width
         else:
             screen_center_x = x - padding_x
         if (y - padding_y) < 0:
             screen_center_y = 0
         elif (y+padding_y) > self.map_height:
-            screen_center_y = self.map_height- self.camera.viewport_height
+            screen_center_y = self.map_height - self.camera.viewport_height
         else:
             screen_center_y = y - padding_y
-            
+
         centered = screen_center_x, screen_center_y
         self.camera.move_to(centered)
 

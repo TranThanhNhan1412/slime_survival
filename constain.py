@@ -21,7 +21,11 @@ VIEWPORT_LEFT_MARGIN = 270
 
 # --- Player
 MOVEMENT_SPEED = 10
-
+PLAYER_FPS = {
+    "Idle":30,
+    "Walk":10,
+    "Attack":5,
+}
 # --- Path 
 
 MAP_PATH = "./slime_survival/tile_world/"

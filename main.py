@@ -3,6 +3,10 @@ import arcade
 from constain import *
 
 
+# feat: port hit and noti
+
+# fix: stop cammera on top and right edges
+
 class MyGame(arcade.Window):
     """Main application class."""
 
@@ -50,11 +54,10 @@ class MyGame(arcade.Window):
             arcade.set_background_color(self.tile_map.background_color)
         self.scene.add_sprite_list_after("Player", "fence_wall")
         self.scene.add_sprite_list_before("Player", "tree")
-        
+
         # player
         self.create_player(self.map_width / 2, self.map_height / 2)
         self.scene.add_sprite("Player", self.player_sprite)
-
 
         # obstructions
         obstructions = [self.tile_map.sprite_lists["fence_wall"],]
@@ -161,18 +164,25 @@ class MyGame(arcade.Window):
     def pan_camera_to_player(self):
 
         # This spot would center on the user
-        screen_center_x = self.player_sprite.center_x - \
-            (self.camera.viewport_width / 2)
-        screen_center_y = self.player_sprite.center_y - (
-            self.camera.viewport_height / 2
-        )
-        screen_center_x = max(0,screen_center_x)
-        screen_center_y = max(0,screen_center_y)
-        screen_center_x = min(screen_center_x,self.map_width)
-        screen_center_y = min(screen_center_y,self.map_height)
-
-        user_centered = screen_center_x, screen_center_y
-        self.camera.move_to(user_centered)
+        x = self.player_sprite.center_x
+        padding_x = self.camera.viewport_width / 2
+        y = self.player_sprite.center_y
+        padding_y = self.camera.viewport_height / 2
+        if (x - padding_x) < 0:
+            screen_center_x = 0
+        elif (x+padding_x) > self.map_width:
+            screen_center_x = self.map_width- self.camera.viewport_width
+        else:
+            screen_center_x = x - padding_x
+        if (y - padding_y) < 0:
+            screen_center_y = 0
+        elif (y+padding_y) > self.map_height:
+            screen_center_y = self.map_height- self.camera.viewport_height
+        else:
+            screen_center_y = y - padding_y
+            
+        centered = screen_center_x, screen_center_y
+        self.camera.move_to(centered)
 
 
 def main():

@@ -23,8 +23,8 @@ VIEWPORT_LEFT_MARGIN = 270
 MOVEMENT_SPEED = 10
 PLAYER_FPS = {
     "Idle":30,
-    "Walk":10,
-    "Attack":5,
+    "Walk":15,
+    "Attack":15,
 }
 # --- Path 
 
@@ -33,6 +33,6 @@ MAP = {
     "delta": os.path.join(MAP_PATH, "map_delta.json")
 }
 
-PLAYER_PATH = "./slime_survival/sprite/Player/"
+PLAYER_PATH = "./slime_survival/sprite/Player_machine/"
 
 SOUND_PATH = "./slime_survival/sound/"

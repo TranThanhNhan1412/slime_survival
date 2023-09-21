@@ -46,16 +46,17 @@ class MyGame(arcade.Window):
             "DOWN": self.load_texture_file("Walk/DOWN"),
             "LEFT": self.load_texture_file("Walk/LEFT"),
         }
-        self.attact_textures = {
-            "UP": self.load_texture_file("Attact/UP"),
-            "RIGHT": self.load_texture_file("Attact/RIGHT"),
-            "DOWN": self.load_texture_file("Attact/DOWN"),
-            "LEFT": self.load_texture_file("Attact/LEFT"),
+        self.attack_textures = {
+            "UP": self.load_texture_file("Attack/UP"),
+            "RIGHT": self.load_texture_file("Attack/RIGHT"),
+            "DOWN": self.load_texture_file("Attack/DOWN"),
+            "LEFT": self.load_texture_file("Attack/LEFT"),
         }
-
+     
         # Load sounds
         self.teleport_sound = arcade.load_sound(SOUND_PATH+"teleport.wav")
-        self.attack_sound = arcade.load_sound(SOUND_PATH+"sword-hit.mp3")
+        self.attack_sound = arcade.load_sound(SOUND_PATH+"player_machine_hit.mp3")
+        self.walk_sound = arcade.load_sound(SOUND_PATH+"player_walk.wav")
 
 
 
@@ -126,12 +127,11 @@ class MyGame(arcade.Window):
 
         # Call update on all sprites
         self.physics_engine.update()
+        self.camera.resize(self.width, self.height)
+        self.gui_camera.resize(self.width, self.height)
         # Pan to the user
         self.pan_camera_to_player()
-        self.update_animation()
-        self.scene.update_animation(
-            delta_time, ["Player"]
-        )
+        self.update_animation_and_sound()
         is_in_teleport = arcade.check_for_collision_with_lists(
             self.player_sprite, self.teleport,
         )
@@ -145,6 +145,7 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         self.player_action = "Walk"
         self.player_frame_i=0
+        self.player_frame=1
         if key == arcade.key.LEFT or key == arcade.key.A:
             self.player_face_direction = "LEFT"
             self.player_sprite.change_x = - MOVEMENT_SPEED
@@ -158,7 +159,7 @@ class MyGame(arcade.Window):
             self.player_face_direction = "DOWN"
             self.player_sprite.change_y = - MOVEMENT_SPEED
 
-        if key == arcade.key.SPACE:
+        if key == arcade.key.Q:
             self.player_action = "Attack"
             arcade.play_sound(self.attack_sound)
 
@@ -166,7 +167,8 @@ class MyGame(arcade.Window):
         """
         Called when the user presses a mouse button.
         """
-        self.player_action = "Idle"
+        if key != arcade.key.Q:
+            self.player_action = "Idle"
         self.player_sprite.change_x = 0
         self.player_sprite.change_y = 0
 
@@ -182,7 +184,7 @@ class MyGame(arcade.Window):
         )
         self.player_sprite.center_x = start_x
         self.player_sprite.center_y = start_y
-        self.player_sprite.texture = self.idle_textures[self.player_frame%(len(self.idle_textures))]
+        self.player_sprite.texture = self.idle_textures[0]
 
 
     def create_map(self):
@@ -209,7 +211,6 @@ class MyGame(arcade.Window):
         ]
 
     def pan_camera_to_player(self):
-
         # This spot would center on the user
         x = self.player_sprite.center_x
         padding_x = self.camera.viewport_width / 2
@@ -241,18 +242,26 @@ class MyGame(arcade.Window):
                 textures.append(arcade.load_texture(os.path.join(full_path,f)))
         return textures
     
-    def update_animation(self):
-        # self.player_sprite.texture = self.idle_textures[1]
+    def update_animation_and_sound(self):
+        self.len_idle_textures =len(self.idle_textures)
+        self.len_walk_textures =len(self.walk_textures[self.player_face_direction])
+        self.len_attack_textures =len(self.attack_textures[self.player_face_direction])
         self.player_frame_i += 1
         if self.player_frame_i%PLAYER_FPS.get(self.player_action,1)==0:
             self.player_frame += 1
             self.player_frame_i=0
+            if self.player_action=="Walk":
+                arcade.play_sound(self.walk_sound)
+
+        if (self.player_frame==self.len_attack_textures) & (self.player_action=="Attack"):
+            self.player_action="Idle"
+
         if self.player_action == "Idle":
-            self.player_sprite.texture = self.idle_textures[self.player_frame%(len(self.idle_textures))]
+            self.player_sprite.texture = self.idle_textures[self.player_frame%(self.len_idle_textures)]
         if self.player_action == "Walk":
-            self.player_sprite.texture = self.walk_textures[self.player_face_direction][self.player_frame%(len(self.idle_textures))]
+            self.player_sprite.texture = self.walk_textures[self.player_face_direction][self.player_frame%(self.len_walk_textures)]
         if self.player_action == "Attack":
-            self.player_sprite.texture = self.attact_textures[self.player_face_direction][self.player_frame%(len(self.idle_textures))]
+            self.player_sprite.texture = self.attack_textures[self.player_face_direction][self.player_frame%(self.len_attack_textures)]
         
 def main():
     window = MyGame()

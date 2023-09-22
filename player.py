@@ -1,188 +1,148 @@
+import os
+import math
+import time
 import arcade
 
-SPRITE_SCALING = 0.5
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Better Move Sprite with Keyboard Example"
-
-MOVEMENT_SPEED = 5
+from constain import *
 
 
 class Player(arcade.Sprite):
+    MOVE_KEY = [
+        arcade.key.LEFT,
+        arcade.key.A,
+        arcade.key.RIGHT,
+        arcade.key.D,
+        arcade.key.UP,
+        arcade.key.W,
+        arcade.key.DOWN,
+        arcade.key.S
+    ]
+    ATTACK_KEY = [arcade.key.SPACE]
 
-    def update(self):
-        """ Move the player """
-        # Move player.
-        # Remove these lines if physics engine is moving player.
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+    def __init__(self, name, start_x, start_y):
+        super().__init__()
 
-class MyGame(arcade.Window):
-    """
-    Main application class.
-    """
+        self.name = name
+        self.action = "Idle"  # IDLE,WALK,ATTACK,TELEPORTING
+        self.face_direction = "DOWN"  # DOWN, LEFT, UP, RIGHT
+        self.texture_frame = 0  # 0--> last texture --> 0->...
+        self.texture_frame_count = 0  # 0--> last texture --> 0->...
 
-    def __init__(self, width, height, title):
-        """
-        Initializer
-        """
+        self.center_x = start_x
+        self.center_y = start_y
 
-        # Call the parent class initializer
-        super().__init__(width, height, title)
+        # Load sound
+        self.attack_sound = arcade.load_sound(
+            SOUND_PATH+"player_machine_hit.mp3")
+        self.walk_sound = arcade.load_sound(SOUND_PATH+"player_walk.wav")
 
-        # Variables that will hold sprite lists
-        self.player_list = None
+        # Load textures
+        self.idle_textures = {
+            "UP": get_texture_files("Idle/UP"),
+            "RIGHT": get_texture_files("Idle/RIGHT"),
+            "DOWN": get_texture_files("Idle/DOWN"),
+            "LEFT": get_texture_files("Idle/LEFT"),
+        }
+        self.walk_textures = {
+            "UP": get_texture_files("Walk/UP"),
+            "RIGHT": get_texture_files("Walk/RIGHT"),
+            "DOWN": get_texture_files("Walk/DOWN"),
+            "LEFT": get_texture_files("Walk/LEFT"),
+        }
+        self.attack_textures = {
+            "UP": get_texture_files("Attack/UP"),
+            "RIGHT": get_texture_files("Attack/RIGHT"),
+            "DOWN": get_texture_files("Attack/DOWN"),
+            "LEFT": get_texture_files("Attack/LEFT"),
+        }
+        self.scale = PLAYER_SCALING
+        self.texture = self.idle_textures[self.face_direction][0]
+        self.len_idle_textures = len(self.idle_textures[self.face_direction])
+        self.len_walk_textures = len(self.walk_textures[self.face_direction])
+        self.len_attack_textures = len(
+            self.attack_textures[self.face_direction])
 
-        # Set up the player info
-        self.player_sprite = None
+    def pan_camera_arround(self, camera, map_width, map_height):
+        # This spot would center on the user
+        if (self.center_x - camera.viewport_width / 2) < 0:
+            camera_x = 0
+        elif (self.center_x+camera.viewport_width / 2) > map_width:
+            camera_x = map_width - camera.viewport_width
+        else:
+            camera_x = self.center_x - camera.viewport_width / 2
+        if (self.center_y - camera.viewport_height / 2) < 0:
+            camera_y = 0
+        elif (self.center_y + camera.viewport_height / 2) > map_height:
+            camera_y = map_height - camera.viewport_height
+        else:
+            camera_y = self.center_y - camera.viewport_height / 2
+        camera.move_to([camera_x, camera_y])
 
+    def on_key_press_action(self, key, modifiers):
+        self.texture_frame_count = 0
+        self.texture_frame = 1
 
-        # Track the current state of what key is pressed
+        if key in Player.ATTACK_KEY:
+            self.is_attacking()
+        if key in Player.MOVE_KEY:
+            self.change_face_direction(key)
+            self.is_walking(PLAYER_SPEED)
 
-        self.left_pressed = False
-
-        self.right_pressed = False
-
-        self.up_pressed = False
-
-        self.down_pressed = False
-
-
-        # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
-
-    def setup(self):
-        """ Set up the game and initialize the variables. """
-
-        # Sprite lists
-        self.player_list = arcade.SpriteList()
-
-        # Set up the player
-        self.player_sprite = Player(":resources:images/animated_characters/female_person/femalePerson_idle.png",
-                                    SPRITE_SCALING)
-        self.player_sprite.center_x = 50
-        self.player_sprite.center_y = 50
-        self.player_list.append(self.player_sprite)
-
-    def on_draw(self):
-        """ Render the screen. """
-
-        # Clear the screen
-        self.clear()
-
-        # Draw all the sprites.
-        self.player_list.draw()
-
-
-    def update_player_speed(self):
-
-
-
-        # Calculate speed based on the keys pressed
-
-        self.player_sprite.change_x = 0
-
-        self.player_sprite.change_y = 0
-
-
-
-        if self.up_pressed and not self.down_pressed:
-
-            self.player_sprite.change_y = MOVEMENT_SPEED
-
-        elif self.down_pressed and not self.up_pressed:
-
-            self.player_sprite.change_y = -MOVEMENT_SPEED
-
-        if self.left_pressed and not self.right_pressed:
-
-            self.player_sprite.change_x = -MOVEMENT_SPEED
-
-        elif self.right_pressed and not self.left_pressed:
-
-            self.player_sprite.change_x = MOVEMENT_SPEED
-
-
-    def on_update(self, delta_time):
-        """ Movement and game logic """
-
-        # Call update to move the sprite
-        # If using a physics engine, call update player to rely on physics engine
-        # for movement, and call physics engine here.
-        self.player_list.update()
-
-
-    def on_key_press(self, key, modifiers):
-
-        """Called whenever a key is pressed. """
-
-
-
-        if key == arcade.key.UP:
-
-            self.up_pressed = True
-
-            self.update_player_speed()
-
-        elif key == arcade.key.DOWN:
-
-            self.down_pressed = True
-
-            self.update_player_speed()
-
-        elif key == arcade.key.LEFT:
-
-            self.left_pressed = True
-
-            self.update_player_speed()
-
-        elif key == arcade.key.RIGHT:
-
-            self.right_pressed = True
-
-            self.update_player_speed()
-
-
+    def change_face_direction(self, key):
+        if key in [arcade.key.LEFT, arcade.key.A]:
+            self.face_direction = "LEFT"
+        if key in [arcade.key.RIGHT, arcade.key.D]:
+            self.face_direction = "RIGHT"
+        if key in [arcade.key.UP, arcade.key.W]:
+            self.face_direction = "UP"
+        if key in [arcade.key.DOWN, arcade.key.S]:
+            self.face_direction = "DOWN"
 
     def on_key_release(self, key, modifiers):
+        """
+        Called when the user presses a mouse button.
+        """
+        if key in Player.MOVE_KEY:
+            self.is_idle()
+            self.change_x = 0
+            self.change_y = 0
 
-        """Called when the user releases a key. """
+    def is_walking(self, speed):
+        self.action = "Walk"
+        if self.face_direction == "LEFT":
+            self.change_x = - speed
+        if self.face_direction == "RIGHT":
+            self.change_x = speed
+        if self.face_direction == "UP":
+            self.change_y = speed
+        if self.face_direction == "DOWN":
+            self.change_y = - speed
 
+    def is_attacking(self):
+        self.action = "Attack"
+        arcade.play_sound(self.attack_sound)
 
+    def is_idle(self):
+        self.action = "Idle"
 
-        if key == arcade.key.UP:
+    def update_animation_and_sound(self):
+        self.texture_frame_count += 1
+        if self.texture_frame_count % PLAYER_FPS.get(self.action, 1) == 0:
+            self.texture_frame += 1
+            self.texture_frame_count = 0
+            if self.action == "Walk":
+                arcade.play_sound(self.walk_sound)
 
-            self.up_pressed = False
+        if self.action == "Idle":
+            ind = self.texture_frame % (self.len_idle_textures)
+            self.texture = self.idle_textures[self.face_direction][ind]
 
-            self.update_player_speed()
+        if self.action == "Walk":
+            ind = self.texture_frame % (self.len_walk_textures)
+            self.texture = self.walk_textures[self.face_direction][ind]
 
-        elif key == arcade.key.DOWN:
-
-            self.down_pressed = False
-
-            self.update_player_speed()
-
-        elif key == arcade.key.LEFT:
-
-            self.left_pressed = False
-
-            self.update_player_speed()
-
-        elif key == arcade.key.RIGHT:
-
-            self.right_pressed = False
-
-            self.update_player_speed()
-
-
-
-def main():
-    """ Main function """
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.setup()
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()
+        if self.action == "Attack":
+            ind = self.texture_frame % (self.len_attack_textures)
+            self.texture = self.attack_textures[self.face_direction][ind]
+            if (self.texture_frame == self.len_attack_textures):
+                self.is_idle()

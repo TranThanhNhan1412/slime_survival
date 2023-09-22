@@ -1,4 +1,5 @@
 import os
+import arcade
 
 SCREEN_TITLE = "Slime Survival"
 
@@ -20,7 +21,7 @@ VIEWPORT_RIGHT_MARGIN = 270
 VIEWPORT_LEFT_MARGIN = 270
 
 # --- Player
-MOVEMENT_SPEED = 10
+PLAYER_SPEED = 10
 PLAYER_FPS = {
     "Idle":30,
     "Walk":15,
@@ -36,3 +37,15 @@ MAP = {
 PLAYER_PATH = "./slime_survival/sprite/Player_machine/"
 
 SOUND_PATH = "./slime_survival/sound/"
+
+
+# common function
+def get_texture_files(name_folder):
+    # Load textures for walking
+    textures = []
+    full_path = os.path.join(PLAYER_PATH, name_folder)+"/"
+    if os.path.exists(full_path):
+        all_file = os.listdir(full_path)
+        for f in all_file:
+            textures.append(arcade.load_texture(os.path.join(full_path,f)))
+    return textures

@@ -43,6 +43,11 @@ SLIME SURVIVAL
 
 - Random monster spawn
 
+- sound: add background sound
+
+### refactor 
+
+- split player to class Player
 
 ## v.0.1: player movement & animation
 

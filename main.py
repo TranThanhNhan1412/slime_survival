@@ -48,6 +48,7 @@ class GameView(arcade.Window):
 
         # Load sounds
         self.teleport_sound = arcade.load_sound(SOUND_PATH+"teleport.wav")
+        self.background_sound = arcade.load_sound(SOUND_PATH+"background.mp3")
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -206,8 +207,10 @@ class GameView(arcade.Window):
 
 
 def main():
-    window = GameView()
-    window.setup()
+    game = GameView()
+    game.setup()
+    arcade.play_sound((game.background_sound), 3, looping=True)
+    
     arcade.run()
 
 

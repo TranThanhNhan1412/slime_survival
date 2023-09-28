@@ -6,8 +6,10 @@ from constain import *
 
 from player import Player
 
+from enemy import Enemy
 
-class MyGame(arcade.Window):
+
+class GameView(arcade.Window):
     """Main application class."""
 
     def __init__(self):
@@ -24,10 +26,15 @@ class MyGame(arcade.Window):
 
         # scene
         self.scene = None
+        self.obstructions = []
 
         # player
         self.player = None
-        self.physics_engine = None
+        self.player_engine = None
+
+        # enemy
+        self.enemy_list = None
+        self.enemy_engine = None
 
         # Fps
         self.last_time = None
@@ -44,6 +51,7 @@ class MyGame(arcade.Window):
 
     def setup(self):
         """Set up the game and initialize the variables."""
+        self.old_action = ''
 
         # Scene
         self.scene = arcade.Scene()
@@ -53,18 +61,34 @@ class MyGame(arcade.Window):
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
+        self.obstructions = [self.tile_map.sprite_lists["fence_wall"],]
+
+        # player
         self.scene.add_sprite_list_after("Player", "fence_wall")
         self.scene.add_sprite_list_before("Player", "tree")
 
-        # player
-        self.player = Player("Machine", self.map_width /2, self.map_height / 2)
+        center_x = self.map_width / 2
+        center_y = self.map_height / 2
+        self.player = Player("Machine", center_x, center_y)
         self.scene.add_sprite("Player", self.player)
 
-        # obstructions
-        obstructions = [self.tile_map.sprite_lists["fence_wall"],]
-        self.physics_engine = arcade.PhysicsEngineSimple(
+        self.player_engine = arcade.PhysicsEngineSimple(
             self.player,
-            obstructions
+            self.obstructions
+        )
+
+        # enemy
+        self.scene.add_sprite_list_after("Enemy", "fence_wall")
+        self.scene.add_sprite_list_before("Enemy", "tree")
+        self.scene.add_sprite_list("Enemy")
+
+        self.enemy_list = []
+        enemy = Enemy("Enemy_"+str(len(self.enemy_list)),
+                      center_x-TILE_PIXEL_SIZE*3, center_y-TILE_PIXEL_SIZE*3)
+        self.scene.add_sprite("Enemy", enemy)
+        self.enemy_engine = arcade.PhysicsEngineSimple(
+            enemy,
+            self.obstructions
         )
 
         # camera
@@ -80,6 +104,56 @@ class MyGame(arcade.Window):
         self.scene.draw()
         self.gui_camera.use()
         self.calc_and_draw_fps()
+
+    def on_update(self, delta_time):
+        """Movement and game logic"""
+
+        # Call update on all sprites
+        self.player_engine.update()
+        self.camera.resize(self.width, self.height)
+        self.gui_camera.resize(self.width, self.height)
+        
+        # player
+        self.player.pan_camera_arround(
+            self.camera, self.map_width, self.map_height)
+        self.player.update_animation_and_sound()
+
+        is_in_teleport = arcade.check_for_collision_with_lists(
+            self.player, self.teleport,
+        )
+        for _ in is_in_teleport:
+            if (self.player.action != "TELEPORTING"):
+                self.player.action = "TELEPORTING"
+                arcade.play_sound(self.teleport_sound)
+        # enemy
+        enemy_collision = arcade.check_for_collision_with_lists(
+            self.player,
+            [self.scene["Enemy"]]
+        )
+
+        for enemy in self.scene['Enemy']:
+            if self.old_action!=enemy.action:
+                print(enemy.action)
+                self.old_action = enemy.action
+
+
+            if enemy in enemy_collision:
+                enemy.is_attacking()
+            else:
+            # enemy
+                player_position = (self.player.center_x - self.player.width / 2,
+                                self.player.center_y - self.player.height / 2)
+                if arcade.has_line_of_sight(player_position,
+                                            enemy.position,
+                                            self.scene['fence_wall'],
+                                            max_distance=ENEMY_VIEW_PADDING):
+                    enemy.auto_walking(*player_position)
+
+                else:
+                    enemy.is_idle()
+                    # print("Idle", end=", ")
+            enemy.update_animation_and_sound()
+
 
     def calc_and_draw_fps(self):
         # Start counting frames
@@ -100,26 +174,6 @@ class MyGame(arcade.Window):
         # Get time for every 60 frames
         if self.frame_count % 60 == 0:
             self.last_time = time.time()
-
-    def on_update(self, delta_time):
-        """Movement and game logic"""
-
-        # Call update on all sprites
-        self.physics_engine.update()
-        self.camera.resize(self.width, self.height)
-        self.gui_camera.resize(self.width, self.height)
-        # Pan to the user
-        self.player.pan_camera_arround(
-            self.camera, self.map_width, self.map_height)
-        self.player.update_animation_and_sound()
-
-        is_in_teleport = arcade.check_for_collision_with_lists(
-            self.player, self.teleport,
-        )
-        for _ in is_in_teleport:
-            if (self.player.action != "TELEPORTING"):
-                self.player.action = "TELEPORTING"
-                arcade.play_sound(self.teleport_sound)
 
     def on_key_press(self, key, modifiers):
         if key in self.player.MOVE_KEY or key in self.player.ATTACK_KEY:
@@ -152,7 +206,7 @@ class MyGame(arcade.Window):
 
 
 def main():
-    window = MyGame()
+    window = GameView()
     window.setup()
     arcade.run()
 

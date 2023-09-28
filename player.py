@@ -1,6 +1,3 @@
-import os
-import math
-import time
 import arcade
 
 from constain import *
@@ -35,25 +32,26 @@ class Player(arcade.Sprite):
         self.attack_sound = arcade.load_sound(
             SOUND_PATH+"player_machine_hit.mp3")
         self.walk_sound = arcade.load_sound(SOUND_PATH+"player_walk.wav")
+        self.die_sound = arcade.load_sound(SOUND_PATH+"player_die.wav")
 
         # Load textures
         self.idle_textures = {
-            "UP": get_texture_files("Idle/UP"),
-            "RIGHT": get_texture_files("Idle/RIGHT"),
-            "DOWN": get_texture_files("Idle/DOWN"),
-            "LEFT": get_texture_files("Idle/LEFT"),
+            "UP": get_texture_files("Player_machine/Idle/UP"),
+            "RIGHT": get_texture_files("Player_machine/Idle/RIGHT"),
+            "DOWN": get_texture_files("Player_machine/Idle/DOWN"),
+            "LEFT": get_texture_files("Player_machine/Idle/LEFT"),
         }
         self.walk_textures = {
-            "UP": get_texture_files("Walk/UP"),
-            "RIGHT": get_texture_files("Walk/RIGHT"),
-            "DOWN": get_texture_files("Walk/DOWN"),
-            "LEFT": get_texture_files("Walk/LEFT"),
+            "UP": get_texture_files("Player_machine/Walk/UP"),
+            "RIGHT": get_texture_files("Player_machine/Walk/RIGHT"),
+            "DOWN": get_texture_files("Player_machine/Walk/DOWN"),
+            "LEFT": get_texture_files("Player_machine/Walk/LEFT"),
         }
         self.attack_textures = {
-            "UP": get_texture_files("Attack/UP"),
-            "RIGHT": get_texture_files("Attack/RIGHT"),
-            "DOWN": get_texture_files("Attack/DOWN"),
-            "LEFT": get_texture_files("Attack/LEFT"),
+            "UP": get_texture_files("Player_machine/Attack/UP"),
+            "RIGHT": get_texture_files("Player_machine/Attack/RIGHT"),
+            "DOWN": get_texture_files("Player_machine/Attack/DOWN"),
+            "LEFT": get_texture_files("Player_machine/Attack/LEFT"),
         }
         self.scale = PLAYER_SCALING
         self.texture = self.idle_textures[self.face_direction][0]

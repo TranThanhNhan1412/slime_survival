@@ -15,6 +15,7 @@ class Enemy(arcade.Sprite):
         self.speed = ENEMY_SPEED
         self.damage = damage
         self.health = health
+        self.health_run_away = health//2
         self.target = None
 
         self.is_stuck = False
@@ -43,13 +44,15 @@ class Enemy(arcade.Sprite):
     def auto_walking(self, end_x, end_y):
         self.texture_frame_count = 0
         self.texture_frame = 1
+        x_diff = end_x - self.center_x
+        y_diff = end_y - self.center_y
+        if (abs(y_diff) < self.height) or (abs(x_diff) < self.width):
+            return
         if self.action not in ['Die']:
             self.action = "Walk"
             self.center_x += self.change_x
             self.center_y += self.change_y
             if random.randrange(100) == 0:
-                x_diff = end_x - self.center_x
-                y_diff = end_y - self.center_y
                 angle = math.atan2(y_diff, x_diff)
                 self.change_x = math.cos(angle) * self.speed
                 self.change_y = math.sin(angle) * self.speed
@@ -78,7 +81,6 @@ class Enemy(arcade.Sprite):
             arcade.play_sound(self.die_sound)
             self.remove_from_sprite_lists()
 
-
     def update_animation_and_sound(self):
         self.texture_frame_count += 1
         if self.texture_frame_count % ENEMY_FPS == 0:
@@ -98,9 +100,7 @@ class Enemy(arcade.Sprite):
         if self.action == "Attack":
             ind = self.texture_frame % (len(self.attack_textures))
             self.texture = self.attack_textures[ind]
-            
 
         if self.action == "Die":
             ind = self.texture_frame % (len(self.die_textures))
             self.texture = self.die_textures[ind]
-            

@@ -38,6 +38,7 @@ SLIME SURVIVAL
     + create: has value exp
     + if around, follow player
     + if nearly, attack player
+    + if its health is low, run away 
     + die
     + asset: sound: spawn, jump, attack, die
 
@@ -48,6 +49,10 @@ SLIME SURVIVAL
 ### refactor 
 
 - split player to class Player
+
+### fix
+
+- is walking, die
 
 ## v.0.1: player movement & animation
 

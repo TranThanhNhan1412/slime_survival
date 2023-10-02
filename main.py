@@ -156,6 +156,9 @@ class GameView(arcade.Window):
         for enemy in self.scene['Enemy']:
             if enemy in enemy_collision:
                 enemy.is_attacking(self.player)
+                if enemy.health <= enemy.health_run_away:
+                    enemy.speed = enemy.speed*2
+                    enemy.auto_walking(enemy.init_x,enemy.init_y)
                 if enemy.health <= 0:
                     enemy.is_die()
             else:

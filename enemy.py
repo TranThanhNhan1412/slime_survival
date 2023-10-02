@@ -6,19 +6,23 @@ from constain import *
 
 class Enemy(arcade.Sprite):
 
-    def __init__(self, name, start_x, start_y):
+    def __init__(self, name, start_x, start_y, damage=1, health=10):
         super().__init__()
 
+        # index
         self.name = name
-        self.action = "Idle"  # IDLE,WALK,ATTACK,TELEPORTING
+        self.action = "Idle"  # IDLE,WALK,ATTACK,DIE
         self.speed = ENEMY_SPEED
+        self.damage = damage
+        self.health = health
+        self.target = None
+
         self.is_stuck = False
         self.texture_frame = 0  # 0--> last texture --> 0->...
         self.texture_frame_count = 0  # 0--> last texture --> 0->...
 
         self.init_x = start_x
         self.init_y = start_y
-
         self.center_x = start_x
         self.center_y = start_y
 
@@ -39,33 +43,41 @@ class Enemy(arcade.Sprite):
     def auto_walking(self, end_x, end_y):
         self.texture_frame_count = 0
         self.texture_frame = 1
-        self.action = "Walk"
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-        diff_x = end_x - self.center_x
-        diff_y = end_y - self.center_y
-        
-        if random.randrange(100) == 0:
-            if (diff_x<15 and diff_y<15):
-                self.is_attacking()
-            else:
-                if (diff_x > diff_y):
-                    self.change_x = self.speed
-                else:
-                    self.change_y = self.speed
-                
+        if self.action not in ['Die']:
+            self.action = "Walk"
+            self.center_x += self.change_x
+            self.center_y += self.change_y
+            if random.randrange(100) == 0:
+                x_diff = end_x - self.center_x
+                y_diff = end_y - self.center_y
+                angle = math.atan2(y_diff, x_diff)
+                self.change_x = math.cos(angle) * self.speed
+                self.change_y = math.sin(angle) * self.speed
 
-    def is_attacking(self):
-        if self.action!='Attack':
+    def is_attacking(self, target):
+        if self.action not in ['Attack', 'Die']:
             arcade.play_sound(self.attack_sound)
             self.texture_frame_count = 0
             self.texture_frame = 1
             self.action = "Attack"
+            self.target = target
+        if (self.texture_frame == len(self.attack_textures)):
+            self.target.health -= self.damage
+            self.target = None
+            self.is_idle()
 
     def is_idle(self):
         self.texture_frame_count = 0
         self.texture_frame = 1
-        self.action = "Idle"
+        if self.action not in ['Die']:
+            self.action = "Idle"
+
+    def is_die(self):
+        self.action = "Die"
+        if (self.texture_frame == len(self.die_textures)):
+            arcade.play_sound(self.die_sound)
+            self.remove_from_sprite_lists()
+
 
     def update_animation_and_sound(self):
         self.texture_frame_count += 1
@@ -86,5 +98,9 @@ class Enemy(arcade.Sprite):
         if self.action == "Attack":
             ind = self.texture_frame % (len(self.attack_textures))
             self.texture = self.attack_textures[ind]
-            if (self.texture_frame == len(self.attack_textures)):
-                self.is_idle()
+            
+
+        if self.action == "Die":
+            ind = self.texture_frame % (len(self.die_textures))
+            self.texture = self.die_textures[ind]
+            

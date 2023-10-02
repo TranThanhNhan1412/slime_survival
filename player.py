@@ -16,12 +16,16 @@ class Player(arcade.Sprite):
     ]
     ATTACK_KEY = [arcade.key.SPACE]
 
-    def __init__(self, name, start_x, start_y):
+    def __init__(self, name, start_x, start_y, damage=2, health=10):
         super().__init__()
 
         self.name = name
         self.action = "Idle"  # IDLE,WALK,ATTACK,TELEPORTING
         self.face_direction = "DOWN"  # DOWN, LEFT, UP, RIGHT
+        self.damage = damage
+        self.health = health
+        self.target = None
+
         self.texture_frame = 0  # 0--> last texture --> 0->...
         self.texture_frame_count = 0  # 0--> last texture --> 0->...
 
@@ -143,4 +147,7 @@ class Player(arcade.Sprite):
             ind = self.texture_frame % (self.len_attack_textures)
             self.texture = self.attack_textures[self.face_direction][ind]
             if (self.texture_frame == self.len_attack_textures):
+                if (self.target is not None):
+                    self.target.health -= self.damage
+                self.target = None
                 self.is_idle()

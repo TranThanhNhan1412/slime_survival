@@ -83,8 +83,7 @@ class GameView(arcade.Window):
         self.scene.add_sprite_list_before("Enemy", "tree")
         self.scene.add_sprite_list("Enemy")
 
-        self.enemy_list = []
-        enemy = Enemy("Enemy_"+str(len(self.enemy_list)),
+        enemy = Enemy("Enemy_"+str(len(self.scene['Enemy'])),
                       center_x-TILE_PIXEL_SIZE*3, center_y-TILE_PIXEL_SIZE*3)
         self.scene.add_sprite("Enemy", enemy)
         self.enemy_engine = arcade.PhysicsEngineSimple(
@@ -108,7 +107,7 @@ class GameView(arcade.Window):
 
         if (len(self.scene['Enemy']) > 0):
             arcade.draw_text(
-                f"Enemy: {self.scene['Enemy'][0].action} {self.scene['Enemy'][0].position[0]:.1f}  {self.scene['Enemy'][0].position[1]:.1f}",
+                f"Enemy: {self.scene['Enemy'][0].action} {self.scene['Enemy'][0].step_run_away}",
                 self.width-300, self.height-32,
                 arcade.color.BLACK, 14)
             arcade.draw_text(

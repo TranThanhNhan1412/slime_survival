@@ -13,8 +13,10 @@ class Enemy(arcade.Sprite):
         self.name = name
         self.action = "Idle"  # IDLE,WALK,ATTACK,DIE
         self.speed = ENEMY_SPEED
-        self.speed_run_away = self.speed + 1
+        self.step_full_health = 20
+        self.step_run_away = 0
         self.damage = damage
+        self.full_health = health
         self.health = health
         self.health_run_away = health//2
         self.target = None
@@ -48,7 +50,10 @@ class Enemy(arcade.Sprite):
         to_x = self.init_x
         to_y = self.init_y
         self.walk_to_taget(to_x , to_y)
-            
+        print(self.texture_frame)
+        if self.texture_frame == self.step_full_health:
+            self.health=self.full_health
+            self.step_run_away=0
 
     def walk_around(self, start_x, start_y):
         self.action = "Walk_around"

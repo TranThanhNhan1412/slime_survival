@@ -108,8 +108,8 @@ class GameView(arcade.Window):
 
         if (len(self.scene['Enemy']) > 0):
             arcade.draw_text(
-                f"Enemy: {self.scene['Enemy'][0].action}",
-                self.width-200, self.height-32,
+                f"Enemy: {self.scene['Enemy'][0].action} {self.scene['Enemy'][0].position[0]:.1f}  {self.scene['Enemy'][0].position[1]:.1f}",
+                self.width-300, self.height-32,
                 arcade.color.BLACK, 14)
             arcade.draw_text(
                 f"{self.scene['Enemy'][0].health}",
@@ -118,7 +118,7 @@ class GameView(arcade.Window):
 
         arcade.draw_text(
             f"Player: {self.player.action}",
-            self.width-200, self.height-32*3,
+            self.width-300, self.height-32*3,
             arcade.color.BLACK, 14)
         arcade.draw_text(
             f"{self.player.health}",
@@ -150,30 +150,31 @@ class GameView(arcade.Window):
             self.player,
             [self.scene["Enemy"]]
         )
+
         if len(enemy_collision) > 0:
             self.player.target = enemy_collision[0]
 
+        player_position = (self.player.center_x,
+                           self.player.center_y)
         for enemy in self.scene['Enemy']:
+            enemy.update_animation_and_sound()
+            if enemy.health <= 0:
+                enemy.is_die()
+                continue
+            if enemy.health <= enemy.health_run_away:
+                enemy.run_away()
+                continue
             if enemy in enemy_collision:
                 enemy.is_attacking(self.player)
-                if enemy.health <= enemy.health_run_away:
-                    enemy.speed = enemy.speed*2
-                    enemy.auto_walking(enemy.init_x,enemy.init_y)
-                if enemy.health <= 0:
-                    enemy.is_die()
             else:
-                # enemy
-                player_position = (self.player.center_x - self.player.width / 2,
-                                   self.player.center_y - self.player.height / 2)
-                if arcade.has_line_of_sight(player_position,
-                                            enemy.position,
-                                            self.scene['fence_wall'],
-                                            max_distance=ENEMY_VIEW_PADDING):
+                is_sight = arcade.has_line_of_sight(player_position,
+                                                    enemy.position,
+                                                    self.scene['fence_wall'],
+                                                    max_distance=ENEMY_VIEW_PADDING/2)
+                if is_sight:
                     enemy.auto_walking(*player_position)
                 else:
-                    enemy.is_idle()
-                    # print("Idle", end=", ")
-            enemy.update_animation_and_sound()
+                    enemy.walk_around(enemy.init_x, enemy.init_y)
 
     def calc_and_draw_fps(self):
         # Start counting frames
@@ -229,8 +230,8 @@ class GameView(arcade.Window):
 def main():
     game = GameView()
     game.setup()
-    arcade.play_sound((game.background_sound), 3, looping=True)
-
+    arcade.play_sound((game.background_sound),
+                      volume=0.5, looping=True, speed=0.7)
     arcade.run()
 
 

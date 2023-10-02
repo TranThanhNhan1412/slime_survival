@@ -31,6 +31,7 @@ class Player(arcade.Sprite):
 
         self.center_x = start_x
         self.center_y = start_y
+        self.hit_box_algorithm ='Simple'
 
         # Load sound
         self.attack_sound = arcade.load_sound(
@@ -122,7 +123,9 @@ class Player(arcade.Sprite):
 
     def is_attacking(self):
         self.action = "Attack"
-        arcade.play_sound(self.attack_sound)
+        if (self.target is not None):
+            self.target.health -= self.damage
+            arcade.play_sound(self.attack_sound)
 
     def is_idle(self):
         self.action = "Idle"
@@ -147,7 +150,5 @@ class Player(arcade.Sprite):
             ind = self.texture_frame % (self.len_attack_textures)
             self.texture = self.attack_textures[self.face_direction][ind]
             if (self.texture_frame == self.len_attack_textures):
-                if (self.target is not None):
-                    self.target.health -= self.damage
                 self.target = None
                 self.is_idle()
